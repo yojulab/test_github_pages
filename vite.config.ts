@@ -5,7 +5,8 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
-      base: '/test_github_pages/', // CHANGE THIS: Set         
+      // base: '/test_github_pages/', // CHANGE THIS: Set         
+      base: '/', // CHANGE THIS: Set         
 
       server: {
         port: 3000,
