@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowRight, Mail } from 'lucide-react';
 import Navbar from './components/Navbar';
 import Section from './components/Section';
 import GeometricHero from './components/GeometricHero';
 import RealEstateAuctionAnalysis from './components/RealEstateAuctionAnalysis';
+import GeminiChat from './components/GeminiChat';
 import { 
   APP_NAME, 
   CONTACT_EMAIL, 
@@ -13,9 +14,20 @@ import {
 } from './constants';
 
 const App: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState<'home' | 'gemini'>('home');
+
+  if (currentPage === 'gemini') {
+    return (
+      <div className="min-h-screen bg-black text-white selection:bg-zinc-800 selection:text-white">
+        <Navbar onNavigate={setCurrentPage} />
+        <GeminiChat />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black text-white selection:bg-zinc-800 selection:text-white">
-      <Navbar />
+      <Navbar onNavigate={setCurrentPage} />
 
       {/* Hero Section */}
       <div className="relative h-screen flex items-center justify-center overflow-hidden bg-black" id="intro">
