@@ -42,9 +42,9 @@ import {
       id: "plane",
       icon: Square,
       color: "text-zinc-300",
-      title: "면 (Plane)",
-      subtitle: "장소와 공동체",
-      description: "공간의 문화적 의미와 장소성을 탐구하며, 공유 공간이 만드는 공동체의 의미를 해석합니다."
+      title: "공간 활용",
+      subtitle: "인간에게 주는 공감 능력 향상",
+      description: "인간에게 주는 공감 능력 향상"
     },
     {
       id: "dimension",
