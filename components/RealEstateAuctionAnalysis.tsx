@@ -3,8 +3,11 @@ import { Upload, FileText, Clock, AlertTriangle } from 'lucide-react';
 import * as pdfjsLib from 'pdfjs-dist';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Set the worker source
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+// Set the worker source using the local bundled worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = /* @vite-ignore */ new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url
+).href;
 
 const RealEstateAuctionAnalysis: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
