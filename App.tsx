@@ -24,7 +24,7 @@ const App: React.FC = () => {
                 공간, 기술, 인간
             </div>
           <h1 className="text-4xl md:text-7xl font-serif font-bold text-white leading-tight mb-8">
-            차원으로 나가는 문
+            다차원 공간 이해 문
           </h1>
           <p className="text-xl md:text-2xl text-zinc-400 font-light italic font-serif mb-12">
             Gateway to Dimensions
@@ -147,7 +147,7 @@ const App: React.FC = () => {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div className="mb-6 md:mb-0">
               <h4 className="text-lg font-bold text-white mb-2">{APP_NAME}</h4>
-              <p className="text-sm text-zinc-500">차원으로 나가는 문</p>
+              <p className="text-sm text-zinc-500">다차원 공간 이해 문</p>
             </div>
             
             <div className="text-left md:text-right">
