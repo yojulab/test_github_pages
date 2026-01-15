@@ -3,6 +3,7 @@ import { ArrowRight, Mail } from 'lucide-react';
 import Navbar from './components/Navbar';
 import Section from './components/Section';
 import GeometricHero from './components/GeometricHero';
+import RealEstateAuctionAnalysis from './components/RealEstateAuctionAnalysis';
 import { 
   APP_NAME, 
   CONTACT_EMAIL, 
@@ -124,6 +125,11 @@ const App: React.FC = () => {
             </div>
           ))}
         </div>
+      </Section>
+
+      {/* Real Estate Auction Analysis Section */}
+      <Section id="auction" dark className="border-t border-white/5">
+        <RealEstateAuctionAnalysis />
       </Section>
 
       {/* Contact Section */}

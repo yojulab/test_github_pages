@@ -18,6 +18,7 @@ import {
     { label: "프레임워크", href: "#framework" },
     { label: "주요 서비스", href: "#services" },
     { label: "연구 영역", href: "#research" },
+    { label: "부동산 경매 분석", href: "#auction" },
     { label: "연락처", href: "#contact" },
   ];
   
