@@ -2,8 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Copy, Check } from 'lucide-react';
 
 const GeminiChat: React.FC = () => {
+  // GitHub Secrets 또는 환경 변수에서 API 키 로드
+  const envApiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const hasEnvKey = !!envApiKey;
+
   const [apiKey, setApiKey] = useState('');
-  const [isApiKeySet, setIsApiKeySet] = useState(false);
+  const [isApiKeySet, setIsApiKeySet] = useState(hasEnvKey);
   const [prompt, setPrompt] = useState('');
   const [response, setResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -44,12 +48,15 @@ const GeminiChat: React.FC = () => {
     setError('');
     setResponse('');
 
+    // 환경 변수 또는 사용자 입력 API 키 사용
+    const keyToUse = hasEnvKey ? envApiKey : apiKey;
+
     try {
       const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey,
+          'x-goog-api-key': keyToUse,
         },
         body: JSON.stringify({
           contents: [
@@ -143,11 +150,21 @@ const GeminiChat: React.FC = () => {
           <p className="text-zinc-400">
             Gemini API를 사용하여 AI 모델의 동작을 확인합니다 (Streaming 방식)
           </p>
+          {hasEnvKey && (
+            <div className="mt-3 inline-block bg-green-900/30 border border-green-800 rounded px-3 py-1 text-xs text-green-300">
+              ✓ GitHub Secrets에서 API 키가 로드되었습니다
+            </div>
+          )}
         </div>
 
         {!isApiKeySet ? (
           <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-8 mb-6">
             <h2 className="text-xl font-semibold mb-4">API 키 설정</h2>
+            <p className="text-zinc-400 text-sm mb-6">
+              환경 변수에서 API 키를 찾을 수 없습니다. 아래에 API 키를 입력하거나 GitHub Secrets에 
+              <code className="bg-zinc-800 px-2 py-1 rounded text-zinc-200">VITE_GEMINI_API_KEY</code>
+              를 설정하세요.
+            </p>
             <div className="flex flex-col gap-4">
               <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-2">
@@ -189,15 +206,17 @@ const GeminiChat: React.FC = () => {
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 <span className="text-sm text-zinc-300">
-                  API 키가 설정되었습니다
+                  {hasEnvKey ? 'GitHub Secrets에서 API 키 로드됨' : 'API 키가 설정되었습니다'}
                 </span>
               </div>
-              <button
-                onClick={handleResetApiKey}
-                className="text-xs bg-zinc-800 hover:bg-zinc-700 px-3 py-1 rounded transition"
-              >
-                변경
-              </button>
+              {!hasEnvKey && (
+                <button
+                  onClick={handleResetApiKey}
+                  className="text-xs bg-zinc-800 hover:bg-zinc-700 px-3 py-1 rounded transition"
+                >
+                  변경
+                </button>
+              )}
             </div>
 
             <form
