@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, FileText, Clock, AlertTriangle } from 'lucide-react';
 import * as pdfjsLib from 'pdfjs-dist';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Set the worker source
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
@@ -39,8 +40,16 @@ const RealEstateAuctionAnalysis: React.FC = () => {
   };
 
   const analyzeWithAI = async (text: string): Promise<{ analysis: string; risks: string[] }> => {
-    const prompt = `
-다음은 부동산 경매 물건에 대한 PDF 내용입니다. 이 내용을 분석하여 다음을 포함한 결과를 제공하세요:
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    
+    if (!apiKey) {
+      throw new Error('Gemini API 키가 설정되지 않았습니다. .env.local 파일에서 VITE_GEMINI_API_KEY를 설정하세요.');
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+    const prompt = `다음은 부동산 경매 물건에 대한 PDF 내용입니다. 이 내용을 분석하여 다음을 포함한 결과를 제공하세요:
 - 물건의 기본 정보 (위치, 감정가, 최저매각가격 등)
 - 시장 분석 및 가치 평가
 - 투자 잠재력
@@ -53,35 +62,27 @@ const RealEstateAuctionAnalysis: React.FC = () => {
 PDF 내용:
 ${text}
 
-분석 결과를 구조화하여 제공하세요.
-    `;
+분석 결과를 구조화하여 제공하세요.`;
 
-    const response = await fetch('/api/ollama/api/generate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'ingu627/exaone4.0:1.2b',
-        prompt,
-        stream: false,
-      }),
-    });
+    try {
+      const result = await model.generateContent(prompt);
+      const aiResponse = result.response.text();
 
-    if (!response.ok) {
-      throw new Error('AI 분석 실패');
+      // Parse the AI response to extract analysis and risks
+      const analysis = aiResponse.split('위험 사항')[0].trim();
+      const risksText = aiResponse.split('위험 사항')[1]?.trim() || '';
+      const risks = risksText
+        .split('\n')
+        .filter((line: string) => line.trim().startsWith('-') || line.trim().startsWith('•'))
+        .map((line: string) => line.trim().replace(/^[-•]\s*/, '').trim());
+
+      return { analysis, risks };
+    } catch (error: any) {
+      if (error.message?.includes('API key')) {
+        throw new Error('Gemini API 키가 유효하지 않습니다. .env.local 파일의 VITE_GEMINI_API_KEY를 확인하세요.');
+      }
+      throw error;
     }
-
-    const data = await response.json();
-    const aiResponse = data.response;
-
-    // Parse the AI response to extract analysis and risks
-    // This is a simple parsing; in reality, you might need more sophisticated parsing
-    const analysis = aiResponse.split('위험 사항')[0].trim();
-    const risksText = aiResponse.split('위험 사항')[1]?.trim() || '';
-    const risks = risksText.split('\n').filter((line: string) => line.trim().startsWith('-')).map((line: string) => line.trim().substring(1).trim());
-
-    return { analysis, risks };
   };
 
   const analyzePDF = async () => {
@@ -103,7 +104,8 @@ ${text}
       });
     } catch (error) {
       console.error('Analysis failed:', error);
-      alert('분석 중 오류가 발생했습니다. Ollama가 실행 중인지 확인하세요.');
+      const errorMessage = error instanceof Error ? error.message : '분석 중 오류가 발생했습니다.';
+      alert(errorMessage);
     } finally {
       setAnalyzing(false);
     }
@@ -152,7 +154,7 @@ ${text}
           disabled={!file || analyzing}
           className="w-full bg-white text-black py-3 px-6 rounded-lg font-medium hover:bg-zinc-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {analyzing ? '분석 중...' : '분석 시작 (ingu627/exaone4.0:1.2b)'}
+          {analyzing ? '분석 중...' : '분석 시작 (Gemini)'}
         </button>
       </div>
 
